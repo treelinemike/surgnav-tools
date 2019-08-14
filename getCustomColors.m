@@ -1,7 +1,7 @@
 % define colors for plotting
 %
 % To use specified color order for a single set of axes:
-% figure; ax = axes('ColorOrder',colors); plot(rand(10),'LineWidth',3); legend;
+% figure; ax = axes('ColorOrder',colors); hold on; plot(rand(10),'LineWidth',3); legend;
 %
 % MATLAB's standard colors can be retrieved by:
 % get(groot,'defaultAxesColorOrder')
@@ -27,12 +27,15 @@ function colors = getCustomColors(varargin)
 
 % custom color order
 colors = [
-    0.7 0.0 0.0; ...
-    1.0 0.7 0.0; ...
-    0.7 0.7 0.0; ...
-    0.0 0.7 0.0; ...
-    0.0 0.0 0.7; ...
-    0.7 0.0 1.0 ];
+    0.0 0.0 0.7; ...   % dark blue
+    0.7 0.0 0.0; ...   % dark red
+    0.0 0.7 0.0; ...   % dark green
+    1.0 0.7 0.0; ...   % dark orange
+    0.7 0.0 0.7; ...   % dark purple
+    1.0 0.0 1.0; ...   % magenta
+    0.7 0.7 0.0; ...   % dark yellow
+    0.3 0.6 1.0; ...   % light blue
+    ];    
 
 % set or revert MATLAB color order if desired
 if(nargin)
