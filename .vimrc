@@ -1,6 +1,15 @@
 set nocompatible
 filetype off                  " required
 
+" HOW TO GET AUTOSAVE WORKING:
+" first install VUNDLE in home directory: C:\users\f002r5k
+" will create .vim folder containing a folder called bundle
+" then put this .vimrc in home directory
+" finally start vim and run :PluginInstall
+"
+" See also:
+" https://github.com/vim-scripts/vim-auto-save
+
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
