@@ -38,6 +38,7 @@ if( size(g.Nodes,1) > 0 )
     cleanedFaces = faces(faceIDs,:);
 else
     cleanedFaces = [];
+    faceIDs = [];
 end
 
 end
