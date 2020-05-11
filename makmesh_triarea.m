@@ -24,6 +24,12 @@ for thisQueryIdx = 1:length(triQueryList)
     end
     vec1 = (triVertices(2,:)-triVertices(1,:))';
     vec2 = (triVertices(3,:)-triVertices(1,:))';
+    if(length(vec1) == 2)
+        vec1 = [vec1;0];
+    end
+    if(length(vec2) == 2)
+        vec2 = [vec2;0];
+    end
     area(thisQueryIdx) = 0.5*norm(cross(vec1,vec2));
 end
 
