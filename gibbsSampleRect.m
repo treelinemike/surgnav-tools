@@ -1,58 +1,70 @@
-% sample from density whose values are given as inputs at every point on an
+% gibbsSampleRect.m
+% Mike Kokko
+% 11-May-2020
+%
+% Sample from density whose values are given as inputs at every point on an
 % n-dimensional grid
-function samples = gibbsSampleRect(xq_cp,pdf,gibbsBurnIn, gibbsM)
+%
+% x_qp:        Query points (i.e. discritized state space) - must be a
+%              rectangular grid in n-dimensions; x_qp is n x m where m is the
+%              number of points in state space; order of columns is the same as
+%              when n-dim array A is serialized in MATLAB via A(:), that is,
+%              fastest changes along the x1 dimenstion, slowes along the xn dim...
+%
+% pdf:         m x 1 vector with each element corresponding to density of the
+%              point encoded in the corresponding column of x_qp
+%
+% dimLengths:  1 x n row vector where the ith element 
+%
+% Nsamp:       Number of samples from pdf_qp to return 
+%
+% gibbsBurnIn: Number of samples to discard at beginning of Markov chain
+% 
+% gibbsM:      After burn in period, will save every m-th sample until
+%              Nsamp samples are collected
 
-% % % % assemble query point vectors for each eigen-direction
-% % % xq_vec = [];
-% % % dimLengths = [];
-% % % for dimIdx = 1:nDim
-% % %     sd = sqrt( val(dimIdx,dimIdx));
-% % %     xq_vec{dimIdx} = -NSD*sd:hss:NSD*sd;
-% % %     dimLengths(dimIdx) = length(xq_vec{dimIdx});
-% % % end
-% % % xq_cp_raw = cartprod(xq_vec)';
-% % % xq_cp = mu + vec*xq_cp_raw; % now in EIGENSPACE! .. call to cartprod() is fast
-% % % 
-% % % ks_pdf = mvksdensity(x_samp_pre',xq_cp','Kernel','epanechnikov','weights',q_samp,'bandwidth',bwScale*bw_opt);
-
-% start sampler at random query point
-x0Idx = randi(size(xq_cp,2));
-x0 = xq_cp(:,x0Idx);
+function samples = gibbsSampleRect(x_qp, pdf_qp, dimLengths, Nsamp, gibbsBurnIn, gibbsM)
 
 % compute total number of Gibbs steps to take
-Nsteps = gibbsBurnIn + 1 + gibbsM*(Np-1); 
+% we wil discard points in the burn in period
+% and only accrue every m-th sample afterward
+Nsteps = gibbsBurnIn + 1 + gibbsM*(Nsamp-1); 
+
+% start sampler at random query point
+x0Idx = randi(size(x_qp,2));
+x0 = x_qp(:,x0Idx);
 
 % start history
 x = x0;
 xIdx = x0Idx;
-x_hist = NaN(size(xq_cp,1),Nsteps+1);
+x_hist = NaN(size(x_qp,1),Nsteps+1);
 x_hist(:,1) = x0;
 xIdx_hist = NaN(1,Nsteps+1);
 xIdx_hist(1) = x0Idx;
 
 % iterate sampler
 for gibbsIter = 1:Nsteps
-    for dimIdx = 1:nDim
+    for dimIdx = 1:size(x_qp,1)
         
         % extract indices for all points in a line along the selected
         % dimension that includes the current point
         subscripts = ndind2sub(dimLengths,xIdx);
-        pointSubscripts = repmat(subscripts,length(xq_vec{dimIdx}),1);
-        pointSubscripts(:,dimIdx) = (1:length(xq_vec{dimIdx}))';
+        pointSubscripts = repmat(subscripts,dimLengths(dimIdx),1);
+        pointSubscripts(:,dimIdx) = (1:dimLengths(dimIdx))';
         ind = ndsub2ind(dimLengths,pointSubscripts);
         
         % compute 1D PDF and CDF along this line
-        pointsAlongDim = xq_cp(:,ind);
+        pointsAlongDim = x_qp(:,ind);
         distAlongDim = pointsAlongDim - pointsAlongDim(:,1);
         distAlongDim = vecnorm(distAlongDim,2,1);
-        normFactor = trapz(distAlongDim,ks_pdf(ind));
-        pdf = ks_pdf(ind)/normFactor;
-        cdf = cumtrapz(distAlongDim,pdf);
+        normFactor = trapz(distAlongDim,pdf_qp(ind));
+        line_pdf = pdf_qp(ind)/normFactor;
+        line_cdf = cumtrapz(distAlongDim,line_pdf);
         
         % sample a point from the CDF
-        localIdx = find(cdf >= rand(1),1,'first');
+        localIdx = find(line_cdf >= rand(1),1,'first');
         xIdx = ind(localIdx);
-        x = xq_cp(:,xIdx);       
+        x = x_qp(:,xIdx);       
     end
     
     % after stepping once along each eigendirection,
