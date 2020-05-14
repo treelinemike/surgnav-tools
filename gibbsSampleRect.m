@@ -1,6 +1,6 @@
 % gibbsSampleRect.m
 % Mike Kokko
-% 11-May-2020
+% 14-May-2020
 %
 % Sample from density whose values are given as inputs at every point on an
 % n-dimensional grid
@@ -48,7 +48,12 @@ for gibbsIter = 1:Nsteps
         
         % extract indices for all points in a line along the selected
         % dimension that includes the current point
+        try
         subscripts = ndind2sub(dimLengths,xIdx);
+        catch
+           xIdx 
+        end
+        
         pointSubscripts = repmat(subscripts,dimLengths(dimIdx),1);
         pointSubscripts(:,dimIdx) = (1:dimLengths(dimIdx))';
         ind = ndsub2ind(dimLengths,pointSubscripts);
@@ -58,13 +63,25 @@ for gibbsIter = 1:Nsteps
         distAlongDim = pointsAlongDim - pointsAlongDim(:,1);
         distAlongDim = vecnorm(distAlongDim,2,1);
         normFactor = trapz(distAlongDim,pdf_qp(ind));
-        line_pdf = pdf_qp(ind)/normFactor;
-        line_cdf = cumtrapz(distAlongDim,line_pdf);
         
-        % sample a point from the CDF
+        % use a flat PDF if we are sampling a portion of state space with
+        % nearly zero density
+        % need this to avoid div by zero
+        % TODO: is 0.0001 the optimal threshold? could use strictly equal
+        % to zero...
+        if( normFactor < 0.0001 )
+            line_pdf = (1/distAlongDim(end))*ones(length(ind),1);
+        else
+            line_pdf = pdf_qp(ind)/normFactor;
+        end
+        
+        
+        % compute and sample a point from the CDF
+        line_cdf = cumtrapz(distAlongDim,line_pdf);
         localIdx = find(line_cdf >= rand(1),1,'first');
         xIdx = ind(localIdx);
-        x = x_qp(:,xIdx);       
+        x = x_qp(:,xIdx);
+        
     end
     
     % after stepping once along each eigendirection,
