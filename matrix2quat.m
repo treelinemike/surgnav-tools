@@ -10,16 +10,8 @@ elseif( norm(eye(3)-R'*R,'fro') > eps*10 )  % example from MATLAB... A' = inv(A)
     error('Input matrix must be orthogonal -> SO(3)');
 end
 
-% fix rotation matrix if determinant is too large
-err = abs(det(R)-1);
-if( err > eps*10)
-    ra = unitvec(R(:,1));
-    rb = R(:,2);
-    rb = unitvec(rb - dot(rb,ra)*ra);
-    rc = cross(ra,rb);
-    R = [ra, rb, rc];
-    warning('Adjusting rotation matrix to correct determinant error (initially: %e; corrected: %e)\n', err, abs(det(R)-1));
-end
+% ensure that R is orthogonal 
+R = fixR(R);
 
 q = zeros(4,1);
 q(1) = sqrt(1+trace(R))/2;
