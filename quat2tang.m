@@ -8,11 +8,10 @@ function tang_comp = quat2tang(q)
     ss2 = logm( R );
     
     if(max(max(abs(ss2-ss))) > 1e-6)
-        disp('logm() formulas inconsistent!');
         R
         ss
         ss2
-        error('al;');
+        error('logm() formulas inconsistent!');
     end
     
     tang_comp = [-ss(2,3), ss(1,3), -ss(1,2)]';
