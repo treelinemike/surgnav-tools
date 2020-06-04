@@ -7,7 +7,7 @@ function tang_comp = quat2tang(q)
     ss = (theta/(2*sin(theta)))*(R-R');
     ss2 = logm( R );
     
-    if(max(max(abs(ss2-ss))) > 1e-6)
+    if(max(max(abs(ss2-ss))) > 1e-4)
         R
         ss
         ss2

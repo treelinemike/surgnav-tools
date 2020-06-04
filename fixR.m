@@ -8,7 +8,7 @@ if( err > eps*10)
     rb = unitvec(rb - dot(rb,ra)*ra);
     rc = cross(ra,rb);
     Rout = [ra, rb, rc];
-    warning('Adjusting rotation matrix to correct determinant error (initially: %e; corrected: %e)\n', err, abs(det(R)-1));
+    warning('Adjusting rotation matrix to correct determinant error (initially: %e; corrected: %e)\n', err, abs(det(Rout)-1));
 else
     Rout = Rin;
 end
