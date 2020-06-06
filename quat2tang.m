@@ -1,18 +1,11 @@
 % extract the 3 coefficients of so(3) generators in tangent space
 % corresponding to a quaternion
-
+%
+% quaternion input should have four rows and may have multiple columns
 function tang_comp = quat2tang(q)
-    R = quat2matrix( q );
-    theta = acos((trace(R)-1)/2);
-    ss = (theta/(2*sin(theta)))*(R-R');
-    ss2 = logm( R );
-    
-    if(max(max(abs(ss2-ss))) > 1e-4)
-        R
-        ss
-        ss2
-        error('logm() formulas inconsistent!');
+    if(size(q,1) ~= 4)
+        error('Quaternion input must have 4 rows!');
     end
-    
-    tang_comp = [-ss(2,3), ss(1,3), -ss(1,2)]';
+    theta = 2*acos(q(1,:));
+    tang_comp = (theta./sin(theta/2)).*q(2:4,:);
 end

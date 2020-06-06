@@ -1,10 +1,12 @@
-% convert so(3) tangent space representation to quaternion
+% convert so(3) tangent space representation to quaternion(s)
+% will accept multiple tangent space vectors and return the same
+% number of quaternions
 function q = tang2quat(tang)
-    theta = norm(tang);
-    if(theta < 10*eps)
-        u = [0 0 0]';
-    else
-        u = tang/theta;
+    if(size(tang,1) ~= 3)
+        error('Tangent space coefficient matrix must have 3 rows!');
     end
-    q = [cos(theta/2); sin(theta/2)*[u(1); u(2); u(3)] ];  % this will always be a unit quaternion -> valid rotation
+    theta = vecnorm(tang,2,1);
+    u = tang./theta;
+    u( :, isnan(u(1,:))) = 0;     % if theta is zero we will need to fix some NaNs and make the corresponding unit vectors all zero
+    q = [cos(theta/2); sin(theta/2).*u];  % this will always be a unit quaternion -> valid rotation
 end
