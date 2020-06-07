@@ -1,6 +1,6 @@
 % sample rotations from an independent, multivariate Gaussian
 % distribution over elements of the so(3) tangent space
-function t = randRotGauss_t(t_mean,sigma,N_samp)
+function t = randRotGauss_t(t_mean, sigma, N_samp)
 
 % allocate array for output
 t = zeros(3,N_samp);
