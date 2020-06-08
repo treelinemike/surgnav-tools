@@ -1,9 +1,10 @@
 % sample rotations from an independent, multivariate uniform
 % distribution over elements of the so(3) tangent space
-function t = randRotUnif_t(t_mean, theta_max, N_samp)
+function [t,delta_theta] = randRotUnif_t(t_mean, theta_max, N_samp)
 
 % allocate array for output
 t = zeros(3,N_samp);
+delta_theta = zeros(1,N_samp);
 
 % mean / DC rotation (without perturbation)
 q_mean = tang2quat(t_mean);
@@ -23,7 +24,9 @@ while( N_accepted < N_samp )
     % 1.0.
     if( norm(U_samp) <= 1 )
         N_accepted = N_accepted + 1;
-        t(:,N_accepted) =  quat2tang(quatmult(q_mean, tang2quat(theta_max*U_samp) )) ;
+        samp_scaled = theta_max*U_samp;
+        delta_theta(N_accepted) = norm(samp_scaled);
+        t(:,N_accepted) =  quat2tang(quatmult(q_mean, tang2quat(samp_scaled) )) ;
     end
     loopCount = loopCount + 1;
 end
