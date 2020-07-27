@@ -23,7 +23,10 @@ for labelIdx = 1:length(allLabels)
     thisLabel = allLabels(labelIdx);
     
     % determine color to paint this label
-    colorIdx = mod(labelIdx-1,size(seg_colors,1))+1;
+    colorIdx = thisLabel+1;
+    if(~isinteger(colorIdx))
+        error('Values in seg_mask must be integer labels.');
+    end
     
     % paint label in this image
     thisLabelMask = (seg_mask == thisLabel);
