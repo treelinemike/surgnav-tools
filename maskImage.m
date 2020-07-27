@@ -1,4 +1,5 @@
 % compute the masked image
+% seg_mask values must be non-negative integers
 function img8_masked = maskImage(img8_gray,seg_mask,seg_colors)
 
 % check input
@@ -23,10 +24,8 @@ for labelIdx = 1:length(allLabels)
     thisLabel = allLabels(labelIdx);
     
     % determine color to paint this label
+    % NOTE: LABEL MUST BE AN INTEGER
     colorIdx = thisLabel+1;
-    if(~isinteger(colorIdx))
-        error('Values in seg_mask must be integer labels.');
-    end
     
     % paint label in this image
     thisLabelMask = (seg_mask == thisLabel);
