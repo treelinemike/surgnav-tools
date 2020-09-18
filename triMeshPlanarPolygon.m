@@ -28,15 +28,15 @@ while( length(idxList) > 2 )
         end
         endIdx = endIdx+2;
     end
-    idxList = idxList(1:2:end)
+    idxList = idxList(1:2:end);
 end
 
-% display result
-points = nsidedpoly(N).Vertices;
-tri = triangulation(ConnectivityList,points);
-figure;
-hold on; grid on;
-patch('Faces',tri.ConnectivityList,'Vertices',points,'FaceColor','w','EdgeColor','k');
-axis equal
+% % display result
+% points = nsidedpoly(N).Vertices;
+% tri = triangulation(ConnectivityList,points);
+% figure;
+% hold on; grid on;
+% patch('Faces',tri.ConnectivityList,'Vertices',points,'FaceColor','w','EdgeColor','k');
+% axis equal;
 
 end
