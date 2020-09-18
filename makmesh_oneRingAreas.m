@@ -2,7 +2,7 @@ function areaList = makmesh_oneRingAreas(thisMesh,varargin)
 
 % allow second input argument to be a list of vertex indices whose one ring areas
 % should be computed. if second argument is empty function will return
-% one-ring areas of all triangles
+% one-ring areas of all vertices
 switch nargin
     case 1
         vertexQueryList = (1:size(thisMesh.Points,1))';
