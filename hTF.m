@@ -19,7 +19,7 @@ elseif( nargin == 2)
     elseif( lastRowZeros && ~lastColZeros )
         premult_flag = 0;
     else
-        error('Cannot determine whether to pre- or post- multiply, please specify explicitly wiht premult_flag argument!');
+        error('Cannot determine whether to pre- or post- multiply, please specify explicitly with premult_flag argument!');
     end
 end
 
