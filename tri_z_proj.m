@@ -28,18 +28,7 @@ pts = proj_pts_unique;
 plot( pts(this_node_idx,1), pts(this_node_idx,2), 'm*', 'MarkerSize',40,'LineWidth',2 );
 
 % plot( pts(this_node_idx,1), pts(this_node_idx,2), 'go', 'MarkerSize',4,'LineWidth',2 );
-attached_tri_idx = vertexAttachments(proj_tri,this_node_idx);
-attached_tri_idx = attached_tri_idx{1};
-neighbor_nodes = [];
-for i = 1:length(attached_tri_idx) % look at each triangle that uses this node
-   this_tri_idx = attached_tri_idx(i);
-   this_tri_nodes = proj_tri.ConnectivityList(this_tri_idx,:);
-   for j = 1:length(this_tri_nodes)  % look at every node of the attached triangle
-      if( this_tri_nodes(j) ~= this_node_idx )
-          neighbor_nodes(end+1) = this_tri_nodes(j);
-      end
-   end
-end
+neighbor_nodes = getNeighborNodes(proj_tri,this_node_idx);
 
 % Because we know we are at a lower y bound the maximum angle will be
 % <= 180deg
@@ -57,12 +46,11 @@ for i = 1:length(neighbor_nodes)
 end
 angle_data = sortrows(angle_data,[3,4],'descend');
 
-
 % now we know the other two vertices attached to our current vertex in the
 % final outline, but we need to get them in the correct order
 neighbor_node_idx = angle_data(1,1:2);
 [~,sortMask] = sortrows(pts(neighbor_node_idx,:),1,'ascend');
-neighbor_nodes_final = neighbor_node_idx(sortMask)
+neighbor_nodes_final = neighbor_node_idx(sortMask);
 final_vertex_list = [ neighbor_nodes_final(1), this_node_idx, neighbor_nodes_final(2)];
 
 % show first step
@@ -72,7 +60,25 @@ plot( pts(final_vertex_list(3),1), pts(final_vertex_list(3),2), 'bo', 'MarkerSiz
 
 % now do every other step....
 while( final_vertex_list(end) ~= final_vertex_list(1))
+    this_node_idx = final_vertex_list(end);
+    neighbor_nodes = getNeighborNodes(proj_tri,this_node_idx);
+    
     
 end
 
 % end
+
+function neighbor_nodes = getNeighborNodes(tri,node_idx)
+attached_tri_idx = vertexAttachments(tri,node_idx);
+attached_tri_idx = attached_tri_idx{1};
+neighbor_nodes = [];
+for i = 1:length(attached_tri_idx) % look at each triangle that uses this node
+    this_tri_idx = attached_tri_idx(i);
+    this_tri_nodes = tri.ConnectivityList(this_tri_idx,:);
+    for j = 1:length(this_tri_nodes)  % look at every node of the attached triangle
+        if( this_tri_nodes(j) ~= node_idx )
+            neighbor_nodes(end+1) = this_tri_nodes(j);
+        end
+    end
+end
+end
