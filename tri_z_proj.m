@@ -3,7 +3,7 @@
 %
 % h = spatial sampling length
 
-function proj_poly = tri_z_proj(tri,h)
+function proj_poly = tri_z_proj(tri,h,reduction_factor)
 
 % merge duplicate vertices
 proj_pts = tri.Points(:,1:2);
@@ -11,6 +11,10 @@ proj_pts_unique = unique(proj_pts,'rows');
 [~,vertex_map] = ismember(proj_pts,proj_pts_unique,'rows');
 proj_cl = [vertex_map(tri.ConnectivityList(:,1)) vertex_map(tri.ConnectivityList(:,2)) vertex_map(tri.ConnectivityList(:,3))];
 
+if(nargin > 2)
+    [proj_cl,proj_pts_unique] = reducepatch(proj_cl,proj_pts_unique,reduction_factor);
+    proj_pts_unique = proj_pts_unique(:,1:2);
+end
 % sample space
 samp_x_vals = min(proj_pts_unique(:,1)):h:max(proj_pts_unique(:,1));
 samp_y_vals = min(proj_pts_unique(:,2)):h:max(proj_pts_unique(:,2));
