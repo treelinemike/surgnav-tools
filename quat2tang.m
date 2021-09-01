@@ -8,7 +8,7 @@ function tang_comp = quat2tang(q)
     end
     
     % normalize quaternion (it should be very close to a unit quaternion anyway...)
-    q_in = q_in/norm(q_in);
+    q = q/norm(q);
     
     theta = 2*acos(q(1,:));
     tang_comp = (theta./sin(theta/2)).*q(2:4,:);
