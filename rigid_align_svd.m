@@ -29,7 +29,7 @@ TF = [R, t; zeros(1,3), 1];
 
 % transform and compute residual RMSE (ie. fiducial registration error)
 p_new = hTF(p,TF,0);
-mse = mean(vecnorm(q-p_new6).^2);
+mse = mean(vecnorm(q-p_new).^2);
 RMSE = sqrt(mse); % fiducial registration error
 
 end
