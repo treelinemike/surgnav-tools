@@ -92,10 +92,10 @@ for test_idx = 1:size(L_filenames,1)
     % TODO: MAGIC NUMBERS!
     [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R);
     if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
-        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.4)
+        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.4);
     end
     if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
-        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.2)
+        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.2);
     end
     if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
         error('Cannot resolve checkerboard!');
