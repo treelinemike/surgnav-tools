@@ -9,7 +9,12 @@ filetype off                  " required
 "
 " See also:
 " https://github.com/vim-scripts/vim-auto-save
-
+"
+" On Linux: 
+" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+" then start vi and run :PluginInstall
+" 
+" 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -39,7 +44,7 @@ filetype plugin indent on    " required
 
 syntax on
 colorscheme desert
-:inoremap <F5> <C-R>=strftime("%c>> ")<CR>
+:inoremap <F5> <C-R>=strftime("%a, %b %d, %Y %H:%M:%S>> ")<CR>
 :nmap <F5> i<F5>
 ":nmap <c-s> :w<CR>
 ":imap <c-s> <Esc>:w<CR>a
