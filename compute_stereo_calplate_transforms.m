@@ -39,8 +39,8 @@ for test_idx = 1:size(L_filenames,1)
     im_R = imread(im_R_filename);
 
     % encode principal point in a grayscale image
-    im_aug_L = encode_principalpoint(pp_L(1),pp_L(2),1280,720,255);
-    im_aug_R = encode_principalpoint(pp_R(1),pp_R(2),1280,720,255);
+    im_aug_L = encode_principalpoint(pp_L(1),pp_L(2),size(im_L,2),size(im_L,1),255);
+    im_aug_R = encode_principalpoint(pp_R(1),pp_R(2),size(im_R,2),size(im_R,1),255);
 
     % rectify stereo pairs
     % MATLAB documentation recommends setting 'OutputView' to 'Valid' ("most suitable for computing disparity")
