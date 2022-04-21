@@ -11,6 +11,16 @@
 % see pg 126 (ch. 5: Quaternion Algebra)
 function R = quat2matrix(q)
 
+% make sure q_in is the correct length and shape
+if (numel(q) == 4)
+    q = reshape(q,4,1);
+else
+    error('Quaternion must have 4 elements.');
+end
+
+% normalize quaternion (it should be very close to a unit quaternion anyway...)
+q = q/norm(q);
+
 R = [ 2*q(1)^2-1+2*q(2)^2,     2*q(2)*q(3)-2*q(1)*q(4), 2*q(2)*q(4)+2*q(1)*q(3);
       2*q(2)*q(3)+2*q(1)*q(4), 2*q(1)^2-1+2*q(3)^2,     2*q(3)*q(4)-2*q(1)*q(2);
       2*q(2)*q(4)-2*q(1)*q(3), 2*q(3)*q(4)+2*q(1)*q(2), 2*q(1)^2-1+2*q(4)^2      ];

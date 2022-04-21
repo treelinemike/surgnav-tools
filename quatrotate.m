@@ -23,6 +23,9 @@ else
     error('Vector to rotate must have 3 elements.');
 end
 
+% normalize quaternion (it should be very close to a unit quaternion anyway...)
+q_in = q_in/norm(q_in);
+
 % extract scalar and vector parts of quaternion
 q0   = q_in(1);   % real (scalar) part of quaternion
 q123 = q_in(2:4); % imaginary (vector) part of quaternion

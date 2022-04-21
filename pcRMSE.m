@@ -14,10 +14,13 @@
 %
 % Inspired by MATLAB pcregistericp() function.
 %
-function rmse = pcRMSE( ref_points, test_points)
+function [rmse,minError,maxError] = pcRMSE( ref_points, test_points)
 
 knnIdx = knnsearch(ref_points, test_points);
 rmse = sqrt( sum(vecnorm(ref_points(knnIdx,:)-test_points,2,2).^2)/size(test_points,1));
+minError = min(vecnorm(ref_points(knnIdx,:)-test_points,2,2));
+maxError = max(vecnorm(ref_points(knnIdx,:)-test_points,2,2));
+
 
 % the following approach might produce higher errors if test points fit a portion of the
 % reference points well but portions of the reference points deviate

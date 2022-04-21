@@ -13,7 +13,7 @@ end
 % starting point for optimization
 obs_shift = obs-mean(obs);
 r_approx = mean(sqrt(obs_shift(:,1).^2 + obs_shift(:,2).^2 + obs_shift(:,3).^2)); % a good guess...
-params0 = [ mean(obs(:,1)), mean(obs(:,2)), mean(obs(:,3)), r_approx ]';
+params0 = [ mea n(obs(:,1)), mean(obs(:,2)), mean(obs(:,3)), r_approx ]';
 
 % assemble observations and a variable for paramters
 % into an anonymous function to be called by fminsearch
