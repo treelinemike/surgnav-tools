@@ -2,7 +2,7 @@
 close; clear; clc; 
 
 % options
-filename = 'H:\CT\31584-010\CT 9001-9004\900403';
+filename = "E:\7131\7135\713292";
 minHUScaleVal = -208;
 maxHUScaleVal = 218;
 
@@ -18,6 +18,8 @@ im = uint8((im-minHUScaleVal)*(255/(maxHUScaleVal-minHUScaleVal))); % rescale HU
 imshow(im);
 
 % extract and show relevant metadata
+seriesDescrip = dinf.SeriesDescription
+sliceThk =  dinf.SliceThickness
 seriesNo = dinf.SeriesNumber
 seriesDate = dinf.SeriesDate
 acqTime = dinf.AcquisitionTime
