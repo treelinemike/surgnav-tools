@@ -1,5 +1,6 @@
 function calplate_data = compute_stereo_calplate_transforms(stereoParams,ckbd_tmp,sync_times, L_filenames,R_filenames,doSaveCheckerboardFigs,doMakeCheckerboardMovie)
-
+global DEBUG_MODE;
+DEBUG_MODE = false;
 % check length of filename lists
 if( (size(L_filenames,1) ~= size(R_filenames,1)) || ( ~isempty(sync_times) && (size(sync_times,1) ~= size(L_filenames,1))) )
     error('Filename lists and sync time list must all have same length!');
@@ -90,15 +91,32 @@ for test_idx = 1:size(L_filenames,1)
 
     % find checkerboard in L and R RECTIFIED images
     % TODO: MAGIC NUMBERS!
+    numRows = 7;
+    numCols = 10;
+    if(DEBUG_MODE)
+        fprintf('Trying default detection\n');
+    end
     [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R);
-    if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
-        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.4);
+    if(DEBUG_MODE)
+        fprintf('Found %d points\n',max((borSize(1)-1),0)*max((borSize(2)-1),0));
     end
-    if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
-        [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(rect_L,rect_R,'MinCornerMetric',0.2);
+    if( (borSize(1) ~= numRows) || (borSize(2) ~= numCols))
+        fprintf('Trying detection with 0.4\n');
+        [ckbd,borSize,pairsUsed] = detectCheckerboardPointsModified(rect_L,rect_R,'MinCornerMetric',0.4);
+        fprintf('Found %d points\n',max((borSize(1)-1),0)*max((borSize(2)-1),0));
     end
-    if( (borSize(1) ~= 7) || (borSize(2) ~= 10))
-        error('Cannot resolve checkerboard!');
+    if( (borSize(1) ~= numRows) || (borSize(2) ~= numCols))
+        fprintf('Trying detection with 0.2\n');
+        [ckbd,borSize,pairsUsed] = detectCheckerboardPointsModified(rect_L,rect_R,'MinCornerMetric',0.2);
+         fprintf('Found %d points\n',max((borSize(1)-1),0)*max((borSize(2)-1),0));
+    end
+    if( (borSize(1) ~= numRows) || (borSize(2) ~= numCols))
+        fprintf('Trying detection with 0.1\n');
+        [ckbd,borSize,pairsUsed] = detectCheckerboardPointsModified(rect_L,rect_R,'MinCornerMetric',0.1);
+         fprintf('Found %d points\n',max((borSize(1)-1),0)*max((borSize(2)-1),0));
+    end
+    if( (borSize(1) ~= numRows) || (borSize(2) ~= numCols))
+        warning('Cannot resolve checkerboard!');
     end
     ckbd = squeeze(ckbd);
     ckbd_L = ckbd(:,:,1);
