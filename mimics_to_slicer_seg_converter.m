@@ -82,21 +82,24 @@ for order_idx = 1:length(slice_order)
     end
 
     for seg_idx = 1:length(gv)
+
         gv_tabmask = (abs(gv(seg_idx).tab.Var3 - z_gv) < 0.1);
         gv_subtab = gv(seg_idx).tab(gv_tabmask,:);
 
-        gv_subtab.Var1 = gv_subtab.Var1 - 0.5*delta_j;
-        gv_subtab.Var2 = gv_subtab.Var2 + 0.5*delta_i;
+        % adjust gray value coordinates to center of voxel
+        gv_subtab.Var1 = gv_subtab.Var1 + 0.5*delta_j;
+        gv_subtab.Var2 = gv_subtab.Var2 - 0.5*delta_i;
         gv_subtab.Var3 = gv_subtab.Var3 - 0.5*slice_inc;
 
         gv_xy = [gv_subtab.Var1 gv_subtab.Var2 ones(size(gv_subtab,1),1)]';
         gv_ij = round(inv(Mxy)*gv_xy);
-        gv_ij = gv_ij(1:2,:) + [1;1];   % [1;1] b/c MATLAB is one indexed!
+        gv_ij(3,:) = [];
+        gv_ij = gv_ij + [1;1];   % [1;1] b/c MATLAB is one indexed!
 
         gv_immask = zeros(size(dcm_data(file_idx).im));
         mask_idx = sub2ind(size(dcm_data(file_idx).im),gv_ij(2,:),gv_ij(1,:));
         gv_immask(mask_idx) = 1;
-
+        
         % add to segdata
         % note: does not allow overlapping segments!
         % last segments have highest priority!
