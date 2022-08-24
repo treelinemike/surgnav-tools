@@ -14,7 +14,8 @@ pp_L = stereoParams.CameraParameters1.Intrinsics.PrincipalPoint;
 pp_R = stereoParams.CameraParameters2.Intrinsics.PrincipalPoint;
 
 % initialize figure
-fh = figure;
+figid_main = 9876;
+fh = figure(figid_main);
 set(gcf,'Position',[1.698000e+02 1.722000e+02 1.199200e+03 0460]);
 fh.Color = [0 0 0];
 
@@ -39,6 +40,10 @@ for test_idx = 1:size(L_filenames,1)
     im_R_filename = R_filenames{test_idx};
     im_R = imread(im_R_filename);
 
+    % sharpen
+    im_L = imsharpen(im_L,'Radius',0.2,'Amount',1.0,'Threshold',0.7);
+    im_R = imsharpen(im_R,'Radius',0.2,'Amount',1.0,'Threshold',0.7);
+
     % encode principal point in a grayscale image
     im_aug_L = encode_principalpoint(pp_L(1),pp_L(2),size(im_L,2),size(im_L,1),255);
     im_aug_R = encode_principalpoint(pp_R(1),pp_R(2),size(im_R,2),size(im_R,1),255);
@@ -54,10 +59,15 @@ for test_idx = 1:size(L_filenames,1)
     pp_rect_L = decode_principalpoint(rect_aug_L);
     pp_rect_R = decode_principalpoint(rect_aug_R);
 
+    % sharpen
+    rect_L = imsharpen(rect_L,'Radius',1.2,'Amount',1.0,'Threshold',0.5);
+    rect_R = imsharpen(rect_R,'Radius',1.2,'Amount',1.0,'Threshold',0.5);
+
     % threshold rectified images adaptively to product binary masks
     % this facilitates checkerboard detection
     rect_L = uint8(imbinarize(rgb2gray(rect_L),'adaptive')*255);
     rect_R = uint8(imbinarize(rgb2gray(rect_R),'adaptive')*255);
+
 
     % % display red/cyan anaglyph
     % im_anaglyph = stereoAnaglyph(rect_L,rect_R);
@@ -67,6 +77,7 @@ for test_idx = 1:size(L_filenames,1)
     % raw on top
     % rectified below
     % show principal point (projection of optical center) in each image
+    figure(figid_main);
     t = tiledlayout(2,3);
     t.Padding = 'tight';
     t.TileSpacing = 'tight';
@@ -163,19 +174,28 @@ for test_idx = 1:size(L_filenames,1)
     end
 
     % align template with reconstructed point cloud
-    [ckbd_tmp_aligned,TF_calplate_to_recon,ckbd_stereo_to_template_rmse] = rigid_align_svd(ckbd_tmp',points_3D_vecs');
-    ckbd_tmp_aligned = ckbd_tmp_aligned';
+    % TODO: we could do some optimization here to choose a better angle and
+    % distance, but this is really close...
+    origin = [0 0 0]'; % doing this in RECON SPACE!
+    [pts_aligned,TF,initial_rmse] = rigid_align_svd(ckbd_tmp',points_3D_vecs'); % INITIAL best fit alignment
+    n = TF(1:3,3);
+    d = dot(n,mean(pts_aligned,2));
+    x = [n; d];
+    [final_rmse, TF_calplate_to_recon, ckbd_tmp_in_recon_frame, ckbd_obs_in_recon_frame] = compute_isect_cost(x,origin,points_3D_vecs,ckbd_tmp); % project points to plane along rays from origin
+    fprintf("RMSE: %0.6f vs. %0.6f\n",initial_rmse,final_rmse);
 
     % store data
     calplate_data(test_idx).TF_calplate_to_recon = TF_calplate_to_recon;
-    calplate_data(test_idx).calplate_dots_in_recon_frame = points_3D_vecs;
-
+    calplate_data(test_idx).ckbd_tmp_in_recon_frame = ckbd_tmp_in_recon_frame;  % checkerboard TEMPLATE transformed to recon space via TF_calplate_to_recon
+    calplate_data(test_idx).ckbd_obs_in_recon_frame = ckbd_obs_in_recon_frame;  % actual checkerboard intersections observed (and projectively corrected)
+    
     % display checkerboard point sets in 3D
+    figure(figid_main);
     p1 = TF_calplate_to_recon(1:3,4);
     ah = nexttile(3,[2,1]);
     hold on; grid on;
-    plot3(points_3D_vecs(:,1),points_3D_vecs(:,2),points_3D_vecs(:,3),'.','MarkerSize',20,'Color',[0 0 0.8]);
-    plot3(ckbd_tmp_aligned(:,1),ckbd_tmp_aligned(:,2),ckbd_tmp_aligned(:,3),'o','MarkerSize',5,'LineWidth',2,'Color',[0.8 0 0]);
+    plot3(ckbd_tmp_in_recon_frame(:,1),ckbd_obs_in_recon_frame(:,2),ckbd_obs_in_recon_frame(:,3),'.','MarkerSize',20,'Color',[0 0 0.8]);
+    plot3(ckbd_tmp_in_recon_frame(:,1),ckbd_tmp_in_recon_frame(:,2),ckbd_tmp_in_recon_frame(:,3),'o','MarkerSize',5,'LineWidth',2,'Color',[0.8 0 0]);
     plotTriad(TF_calplate_to_recon,8);
     plot3(0,0,0,'.','MarkerSize',50,'Color',0.5*ones(1,3)); % camera
     xlabel('\bfx');
@@ -187,10 +207,10 @@ for test_idx = 1:size(L_filenames,1)
     ah.YAxis.Color = [1 1 1];
     ah.ZAxis.Color = [1 1 1];
     ah.Color = 0.15*ones(1,3);
-    title(sprintf('Template Fit %0.4fmm RMSE',ckbd_stereo_to_template_rmse),'FontName','fixedwidth','FontSize',10,'FontWeight','bold','Color',[0 1 0]);
+    title(sprintf('Template Fit %0.4fmm RMSE',final_rmse),'FontName','fixedwidth','FontSize',10,'FontWeight','bold','Color',[0 1 0]);
     xlim([-50 50]);
     ylim([-50 50]);
-    zlim([-5 120]);
+    zlim([-5 150]);
     drawnow;
 
     % save figure as image file if desired
@@ -205,4 +225,35 @@ end
 % generate video if desired
 if(doSaveCheckerboardFigs && doMakeCheckerboardMovie)
     system('ffmpeg -y -r 2 -start_number 1 -i ckbd%03d.png -vf scale="trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 25 -r 25 ckbd.mp4');
+end
+end
+
+% x = [u1 u2 u3 d]
+function [rmse,TF,ckbd_tmp_in_recon_frame,ckbd_obs_in_recon_frame] = compute_isect_cost(x,origin,points,template)
+    d = x(4);
+    origin = reshape(origin,3,1);
+    uv_plane = reshape(x(1:3),3,1);
+    ckbd_obs_in_recon_frame = nan(size(points));
+    for point_idx = 1:size(points,1)
+        vec = points(point_idx,:)'-origin;
+        uv_pt = unitvec(vec);
+        ckbd_obs_in_recon_frame(point_idx,:) = origin + (d/dot(uv_pt,uv_plane))*uv_pt;
+    end
+
+    figure(7878);
+    ph = [];
+    cla;
+    hold on; grid on; axis equal;
+    ph(1) = plot3(points(:,1),points(:,2),points(:,3),'.','MarkerSize',20,'Color',[0 0 1]);
+%     plot3(origin(1),origin(2),origin(3),'.','MarkerSize',50,'Color',[0 0 0]);
+    ph(2) = plot3(ckbd_obs_in_recon_frame(:,1),ckbd_obs_in_recon_frame(:,2),ckbd_obs_in_recon_frame(:,3),'.','MarkerSize',20,'Color',[1 1 0]);
+    [ckbd_tmp_in_recon_frame,TF,rmse] = rigid_align_svd(template',ckbd_obs_in_recon_frame');
+    ckbd_tmp_in_recon_frame = ckbd_tmp_in_recon_frame';
+    ph(3) = plot3(ckbd_tmp_in_recon_frame(:,1),ckbd_tmp_in_recon_frame(:,2),ckbd_tmp_in_recon_frame(:,3),'+','MarkerSize',10,'LineWidth',2,'Color',[0.8 0 0]);
+    for pt_idx = 1:size(points,1)
+        plot3([0 points(pt_idx,1)],[0 points(pt_idx,2)],[0 points(pt_idx,3)],'-','LineWidth',1,'Color',0.4*ones(1,3));
+        plot3([0 ckbd_obs_in_recon_frame(pt_idx,1)],[0 ckbd_obs_in_recon_frame(pt_idx,2)],[0 ckbd_obs_in_recon_frame(pt_idx,3)],'-','LineWidth',1,'Color',0.3*ones(1,3));
+    end
+    legend(ph,{'Raw','Projected','Template Fit'});
+    drawnow;
 end
