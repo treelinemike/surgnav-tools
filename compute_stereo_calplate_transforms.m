@@ -90,7 +90,7 @@ for test_idx = 1:size(L_filenames,1)
     imshow(im_R);
     hold on; axis image;
     plot(pp_R(1),pp_R(2),'+','MarkerSize',20,'LineWidth',2.5,'Color',[0 0.8 0.8]);
-    text(10,720,0,{im_L_filename,sync_time_string},'Color',[0 1 0],'FontSize',10,'VerticalAlignment','cap','Rotation',90,'FontName','FixedWidth','FontWeight','bold');
+    text(10,720,0,{im_R_filename,sync_time_string},'Color',[0 1 0],'FontSize',10,'VerticalAlignment','cap','Rotation',90,'FontName','FixedWidth','FontWeight','bold');
     nexttile(4);
     imshow(rect_L);
     hold on; axis image;
@@ -188,7 +188,8 @@ for test_idx = 1:size(L_filenames,1)
     calplate_data(test_idx).TF_calplate_to_recon = TF_calplate_to_recon;
     calplate_data(test_idx).ckbd_tmp_in_recon_frame = ckbd_tmp_in_recon_frame;  % checkerboard TEMPLATE transformed to recon space via TF_calplate_to_recon
     calplate_data(test_idx).ckbd_obs_in_recon_frame = ckbd_obs_in_recon_frame;  % actual checkerboard intersections observed (and projectively corrected)
-    
+    calplate_data(test_idx).rmse = final_rmse;
+
     % display checkerboard point sets in 3D
     figure(figid_main);
     p1 = TF_calplate_to_recon(1:3,4);
