@@ -146,7 +146,7 @@ for test_idx = 1:size(L_filenames,1)
 
     % RECONSTRUCT CHECKERBOARD
     % i.e. compute the 3D position of each point in the checkerboard
-    % w.r.t. some frame... we'll call it the "recon" frame
+    % w.r.t. some frame... we'll call it the "recon" frame (really left eye frame)
     % which should be situated generally near the endoscope tip
 
     % initialize disparity map and lookup table
@@ -183,6 +183,9 @@ for test_idx = 1:size(L_filenames,1)
     x = [n; d];
     [final_rmse, TF_calplate_to_recon, ckbd_tmp_in_recon_frame, ckbd_obs_in_recon_frame] = compute_isect_cost(x,origin,points_3D_vecs,ckbd_tmp); % project points to plane along rays from origin
     fprintf("RMSE: %0.6f vs. %0.6f\n",initial_rmse,final_rmse);
+
+%     % DO NOT PROJECT!!
+%     ckbd_obs_in_recon_frame = points_3D_vecs;
 
     % store data
     calplate_data(test_idx).TF_calplate_to_recon = TF_calplate_to_recon;
