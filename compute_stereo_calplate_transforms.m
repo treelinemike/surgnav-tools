@@ -1,13 +1,24 @@
-function calplate_data = compute_stereo_calplate_transforms(stereoParams,ckbd_tmp,sync_times, L_filenames,R_filenames,doSaveCheckerboardFigs,doMakeCheckerboardMovie)
+function calplate_data = compute_stereo_calplate_transforms(stereoParams,ckbd_tmp,sync_times, L_filenames,R_filenames,doSaveCheckerboardFigs,doMakeCheckerboardMovie,varargin)
 global DEBUG_MODE;
 DEBUG_MODE = false;
+
 % check length of filename lists
 if( (size(L_filenames,1) ~= size(R_filenames,1)) || ( ~isempty(sync_times) && (size(sync_times,1) ~= size(L_filenames,1))) )
     error('Filename lists and sync time list must all have same length!');
 end
 
-% initialize storage
-calplate_data = [];
+if(nargin == 8)
+    % import storage
+    calplate_data = varargin{end};
+elseif(nargin > 8)
+    error('Too many arguments!');
+else
+    % initialize storage
+    calplate_data = [];
+end
+
+
+
 
 % extract principal points for L & R images
 pp_L = stereoParams.CameraParameters1.Intrinsics.PrincipalPoint;
