@@ -32,10 +32,9 @@ cam_loc = TF_camera(1:3,4);
 % first reject any faces that we would be seeing from the back side
 f_norms = faceNormal(tri_input);
 face_mask = false(size(f_norms,1),1);
-cam_vec = TF_camera(1:3,3);
 for face_idx = 1:size(f_norms)
     this_face_normal = f_norms(face_idx,:)';
-    if(dot(this_face_normal,cam_vec) < -0.1)
+    if(dot(this_face_normal,TF_camera(1:3,3)) < -0.1)
         face_mask(face_idx) = true;
     end
 end
@@ -94,7 +93,7 @@ while( faceOrderIdx <= length(sortedFaceInds) )
         figure(fhb)
         cla
         hold on; grid on; axis equal;
-        view([10,-60]);
+        view([0,-90]);
         acceptedFaces = f_culled(sortedFaceInds(1:faceOrderIdx),:);
         allFacesInPlay = f_culled(sortedFaceInds(faceOrderIdx:end),:);
         currentShadowFace = f_culled(faceIdx,:);
@@ -145,12 +144,13 @@ end
 f_shadow = f_culled(sortedFaceInds,:);
 v_shadow = v_culled;
 [f_shadow,v_shadow] = makmesh_removeUnusedVertices(f_shadow,v_shadow);
-f_shadow = makmesh_trimIslands(f_shadow,v_shadow);
+% f_shadow = makmesh_trimIslands(f_shadow,v_shadow);
 
 % show
 if(plot_flag)
     figure(fha);
     patch('vertices',v_shadow,'faces',f_shadow,'FaceColor',[0.6 1 0.6],'EdgeColor',[0 0 0],'FaceAlpha',0.5);
+%     pause;
 end
 
 end
