@@ -54,3 +54,6 @@ let g:auto_save_events = ["InsertLeave", "TextChanged","TextChangedI"]
 let g:auto_save = 1  " enable AutoSave on Vim startup
 
 :filetype indent on "indent according to the file extension
+set expandtab
+set tabstop=4
+set shiftwidth=4
