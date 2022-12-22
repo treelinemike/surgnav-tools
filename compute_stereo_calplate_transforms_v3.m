@@ -59,6 +59,9 @@ for pose_idx = 1:size(L_filenames,1)
     im_R_filename = R_filenames{pose_idx};
     im_R = imread(im_R_filename);
 
+    % display filename
+    fprintf('Loading file: %s\n',im_L_filename);
+
     % TODO: UNDISTORT HERE, ESPECIALLY FOR DA VINCI S
     im_L_undistort = undistortImage(im_L,stereoParams.CameraParameters1,"cubic",'OutputView','same');
     im_R_undistort = undistortImage(im_R,stereoParams.CameraParameters2,"cubic",'OutputView','same');
@@ -92,6 +95,7 @@ for pose_idx = 1:size(L_filenames,1)
     numCols = 10;
     [ckbd,borSize,pairsUsed] = detectCheckerboardPoints(im_L_undistort,im_R_undistort);
     if( (borSize(1) ~= numRows) || (borSize(2) ~= numCols))
+        fprintf('INITIAL DETECTION FAILED!\n');
         fprintf('Trying detection with 0.4\n');
         [ckbd,borSize,pairsUsed] = detectCheckerboardPointsModified(im_L_undistort,im_R_undistort,'MinCornerMetric',0.4);
         fprintf('Found %d points\n',max((borSize(1)-1),0)*max((borSize(2)-1),0));
