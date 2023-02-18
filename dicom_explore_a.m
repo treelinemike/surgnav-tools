@@ -2,7 +2,7 @@
 close; clear; clc; 
 
 % options
-filename = "C:\Users\f002r5k\Desktop\20220620-slicer-demo\kokko_kidney_phantom\KIDNEY_PHANTOM_4_5_22.CT.HEAD_ARONSONSEEG_(ADULT).0003.0070.2022.04.05.09.42.53.135788.80792345.IMA";
+filename = "G:\My Drive\surgnav\20221103-ultrasound-cal\dicom\01_E1113480";
 minHUScaleVal = -208;
 maxHUScaleVal = 218;
 
