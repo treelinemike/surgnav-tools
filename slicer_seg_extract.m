@@ -16,11 +16,11 @@ close all; clear; clc;
 
 % options
 show_visualizaton = true;
-seg_filename = 'Segmentation.seg.nrrd';
-vol_filename = '3 mm 1R.nrrd';
+seg_filename = 'C:\Users\f002r5k\Desktop\1R_Shen\Segmentation.seg.nrrd';
+vol_filename = 'C:\Users\f002r5k\Desktop\1R_Shen\3 mm 1R.nrrd';
 desired_seg_name = 'CTV-D.Shen';
 seg_mask_extension = 'png';
-seg_mask_folder = 'mask_pngs';
+seg_mask_folder = 'C:\Users\f002r5k\Desktop\1R_Shen\mask_pngs';
 
 % load segment header info and data
 seg_info = nrrdinfo(seg_filename);
@@ -41,7 +41,7 @@ assert(seg_num_slices == vol_num_slices,'Segmentation slice count does not match
 seg_num = 0;
 found_all_segs = false;
 all_fields = fields(seg_info.RawAttributes);
-seg_tab = cell2table(cell(0,5),'VariableNames',{'seg_num','seg_name','seg_layer','seg_value','seg_color'});
+seg_tab = table('Size',[0,5],'VariableTypes',{'double','string','double','double','double'},'VariableNames',{'seg_num','seg_name','seg_layer','seg_value','seg_color'});
 while(~found_all_segs)
     seg_prefix   = sprintf('segment%d_',seg_num);
     field_name   = [seg_prefix 'name'];
@@ -106,7 +106,7 @@ for slice_idx = 1:seg_num_slices
     if(show_visualizaton)
         img_raw = double(vol_data(:,:,slice_idx));
         img_raw = img_raw - min(img_raw(:));
-        img_raw = uint8( img_raw * (255/max(img_raw(:)))  );
+        img_raw = uint8( img_raw * (255/max(img_raw(:)))  ); % TODO: apply a more thoughtful window/level?
         img_overlay = imoverlay(img_raw,seg_map,seg_color);
         imshow(img_overlay,[]);
         drawnow;
