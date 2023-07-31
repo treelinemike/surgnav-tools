@@ -18,7 +18,7 @@ function TF_toparent_ras = convertSavedSlicerTF(TF_fromparent_lps_elements)
     if( ~isvector(TF_fromparent_lps_elements) || (numel(TF_fromparent_lps_elements) ~= 12) )
         error('Invalid input, must be a 12-element vector of elements saved by 3D Slicer.');
     end
-    TF = [reshape(TF_fromparent_lps_elements(1:9),3,3)' TF_fromparent_lps_elements(10:12); 0 0 0 1];
+    TF = [transpose(reshape(TF_fromparent_lps_elements(1:9),3,3)) TF_fromparent_lps_elements(10:12); 0 0 0 1];
     ras2lps = diag([-1 -1 1 1]);
     TF_toparent_ras = inv(ras2lps*TF*ras2lps);
 end

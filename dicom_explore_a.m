@@ -2,7 +2,7 @@
 close; clear; clc; 
 
 % options
-filename = "G:\My Drive\surgnav\20221103-ultrasound-cal\dicom\01_E1113480";
+filename = "C:\Users\f002r5k\Downloads\2.25.118536877960140261913892053863663681705.dcm";
 minHUScaleVal = -208;
 maxHUScaleVal = 218;
 
