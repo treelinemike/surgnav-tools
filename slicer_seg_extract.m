@@ -99,12 +99,12 @@ end
 for slice_idx = 1:seg_num_slices
 
     % extract and save appropriate segmentation mask
-    seg_map = (seg_data(:,:,slice_idx,seg_layer+1) == seg_value);
+    seg_map = transpose(seg_data(:,:,slice_idx,seg_layer+1) == seg_value);  % TODO: do we really want to store this transposed from the format stored in the volume NRRD?
     imwrite(seg_map,fullfile(seg_mask_folder,sprintf('%s_%04d.%s',desired_seg_name,slice_idx,seg_mask_extension)));  % note: now 1-indexed: subtract 1 from slice_idx if you want...
 
     % produce an overlay image for verification
     if(show_visualizaton)
-        img_raw = double(vol_data(:,:,slice_idx));
+        img_raw = transpose(double(vol_data(:,:,slice_idx)));
         img_raw = img_raw - min(img_raw(:));
         img_raw = uint8( img_raw * (255/max(img_raw(:)))  ); % TODO: apply a more thoughtful window/level?
         img_overlay = imoverlay(img_raw,seg_map,seg_color);
