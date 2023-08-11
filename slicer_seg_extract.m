@@ -22,6 +22,12 @@ desired_seg_name = 'CTV-D.Shen';
 seg_mask_extension = 'png';
 seg_mask_folder = 'C:\Users\f002r5k\Desktop\1R_Shen\mask_pngs';
 
+
+v = VideoWriter('slicer_to_matlab.avi');
+v.FrameRate = 10;
+open(v);
+
+
 % load segment header info and data
 seg_info = nrrdinfo(seg_filename);
 seg_num_slices = seg_info.ImageSize(3);
@@ -111,6 +117,14 @@ for slice_idx = 1:seg_num_slices
         imshow(img_overlay,[]);
         drawnow;
         pause(0.01);
+
+        ax = gca;
+        ax.Units = "pixels";
+        frame = getframe(gcf,ax.Position);
+        writeVideo(v,frame);
+
     end
 
 end
+
+close(v);
