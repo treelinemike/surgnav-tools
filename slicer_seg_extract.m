@@ -8,6 +8,22 @@
 % We had previously used functions from the link above, but are now porting
 % to the native MATLAB functions for robustness and future compatibility.
 % 
+% This script is not set up to handle labelmaps whose dimensions differ
+% from the base volume dimensions. 3D slicer can handle this without a
+% problem and uses spatial mapping and offset parameters in the NRRD to
+% make the appropriate conversions. If the segmentation and volume of
+% inerest have inconsistent dinemsions produce a new segmentation in 3D
+% Slicer as follows:
+% 1. Export desired segmentation as a binary labelmap with the correct
+% volume selected as base volume
+% 2. Create a new segmentation, associate it with the correct volume, then
+% create a new segment and draw anything in it on one slice. This
+% presumably initializes the segmentation data structure to have the same
+% dimensions as the base volume
+% 3. In the Segmentations module, import the binary labelmap that had
+% previously been exported
+% 4. Delete the temporary segment
+%
 % Author: M. Kokko
 % Updated: 31-Jul-2023
 
@@ -16,11 +32,11 @@ close all; clear; clc;
 
 % options
 show_visualizaton = true;
-seg_filename = 'C:\Users\f002r5k\Desktop\1R_Shen\Segmentation.seg.nrrd';
-vol_filename = 'C:\Users\f002r5k\Desktop\1R_Shen\3 mm 1R.nrrd';
-desired_seg_name = 'CTV-D.Shen';
+seg_filename = 'C:\Users\f002r5k\Desktop\1R_jerry\Segmentation_3mm_FINAL.seg.nrrd';
+vol_filename = 'C:\Users\f002r5k\Desktop\1R_jerry\C1_3mm.nrrd';
+desired_seg_name = 'C1FTV100';
 seg_mask_extension = 'png';
-seg_mask_folder = 'C:\Users\f002r5k\Desktop\1R_Shen\mask_pngs';
+seg_mask_folder = 'C:\Users\f002r5k\Desktop\1R_jerry\mask_pngs';
 
 
 v = VideoWriter('slicer_to_matlab.avi');
