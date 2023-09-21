@@ -14,7 +14,7 @@ kinematicsPCIP = '192.168.10.70';
 %% Send standard network ping to Hyperdecks to check physical connection
 use.hyperDeckLeft = true;
 use.hyperDeckRight = true;
-use.kinematicsPC = false;
+use.kinematicsPC = true;
 pingError = false;
 
 if(use.hyperDeckLeft)
