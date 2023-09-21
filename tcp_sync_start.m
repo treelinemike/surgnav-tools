@@ -14,7 +14,7 @@ kinematicsPCIP = '192.168.10.70';
 %% Send standard network ping to Hyperdecks to check physical connection
 use.hyperDeckLeft = true;
 use.hyperDeckRight = true;
-use.kinematicsPC = true;
+use.kinematicsPC = false;
 pingError = false;
 
 if(use.hyperDeckLeft)
@@ -147,15 +147,22 @@ end
 % wait just in case anything needs to catch up asynchronously...
 pause(0.5);
 
+
 % send record command to each device as quickly as possible
+start_dur = [];
 if(use.hyperDeckLeft && use.hyperDeckRight && use.kinematicsPC)
+    tic;
     hyperDeckLeftSocket.writeline('record');
     hyperDeckRightSocket.writeline('record');
     kinematicsPCSocket.writeline('record');
+    start_dur = toc;
 elseif(use.hyperDeckLeft && use.hyperDeckRight)
+    tic;
     hyperDeckLeftSocket.writeline('record');
     hyperDeckRightSocket.writeline('record');
+    start_dur = toc;
 else
+    tic;
     if(use.hyperDeckLeft)
         hyperDeckLeftSocket.writeline('record');
     end
@@ -165,6 +172,7 @@ else
     if(use.kinematicsPC)
         kinematicsPCSocket.writeline('record');
     end
+    start_dur = toc;
 end
 
 % get response to record command (if applicable) and close socket
@@ -183,3 +191,6 @@ if(use.kinematicsPC)
     fprintf('KINPC record command sent.\n');
     clear kinematicsPCSocket;
 end
+
+% report time required to start
+fprintf("Syncronized start duration: %0.4fs\n",start_dur)
