@@ -10,12 +10,11 @@ swping_max_attempts = 3;   % number of HyperDeck ping retries (to avoid lockups)
 hyperDeckLeftIP = '192.168.10.50';
 hyperDeckRightIP = '192.168.10.60';
 kinematicsPCIP = '192.168.10.70';
-kinematicsPCIP = '127.0.0.1';
 
 %% Send standard network ping to Hyperdecks to check physical connection
 use.hyperDeckLeft = true;
 use.hyperDeckRight = true;
-use.kinematicsPC = false;
+use.kinematicsPC = true;
 pingError = false;
 
 if(use.hyperDeckLeft)
@@ -59,11 +58,10 @@ end
 fprintf("\n");
 
 %% open sockets to each device and send initialization commands
-
 if(use.hyperDeckLeft)
     
     % open socket and flush input and output buffers
-    hyperDeckLeftSocket = tcpclient(hyperDeckLeftIP,9993,'ConnectTimeout',5,'Timeout',5);
+    hyperDeckLeftSocket = tcpclient(hyperDeckLeftIP,9993,'ConnectTimeout',5,'Timeout',5,'EnableTransferDelay',false);
     hyperDeckLeftSocket.flush();
     
     % attempt software ping
@@ -95,14 +93,14 @@ if(use.hyperDeckLeft)
     hyperDeckLeftSocket.writeline('slot select: slot id: 1');
     resp = hyperDeckLeftSocket.readline();
     disp(['LEFT HyperDeck slot 1 select: ' strtrim(char(resp))]);
-
     fprintf('\n');
+    hyperDeckLeftSocket.flush();
 end
 
 if(use.hyperDeckRight)
     
     % open socket and flush input and output buffers
-    hyperDeckRightSocket = tcpclient(hyperDeckRightIP,9993,'ConnectTimeout',5,'Timeout',5);
+    hyperDeckRightSocket = tcpclient(hyperDeckRightIP,9993,'ConnectTimeout',5,'Timeout',5,'EnableTransferDelay',false);
     hyperDeckRightSocket.flush();
     
     % attempt software ping
@@ -136,29 +134,38 @@ if(use.hyperDeckRight)
     disp(['RIGHT HyperDeck slot 1 select: ' strtrim(char(resp))]);
 
     fprintf('\n');
+    hyperDeckRightSocket.flush();
 end
 
 
 if(use.kinematicsPC)
-    kinematicsPCSocket = tcpclient(kinematicsPCIP,9993,'ConnectTimeout',5,'Timeout',5);
-    kinematicsPCSocket.flush();
+    kinematicsPCSocket = tcpclient(kinematicsPCIP,9993,'ConnectTimeout',5,'Timeout',5,'EnableTransferDelay',false);
     fprintf('KINPC socket creation successful.\n');
+    kinematicsPCSocket.flush();
 end
 
+% wait just in case anything needs to catch up asynchronously...
+pause(0.5);
 
-% start recording on both Hyper Decks
-% Note: \n seems to work in MATLAB on windows, need \r\n in python
-if(use.hyperDeckLeft)
-    hyperDeckLeftSocket.writeline('record');    
-end
-if(use.hyperDeckRight)
+% send record command to each device as quickly as possible
+if(use.hyperDeckLeft && use.hyperDeckRight && use.kinematicsPC)
+    hyperDeckLeftSocket.writeline('record');
     hyperDeckRightSocket.writeline('record');
+    kinematicsPCSocket.writeline('record');
+elseif(use.hyperDeckLeft && use.hyperDeckRight)
+    hyperDeckLeftSocket.writeline('record');
+    hyperDeckRightSocket.writeline('record');
+else
+    if(use.hyperDeckLeft)
+        hyperDeckLeftSocket.writeline('record');
+    end
+    if(use.hyperDeckRight)
+        hyperDeckRightSocket.writeline('record');
+    end
+    if(use.kinematicsPC)
+        kinematicsPCSocket.writeline('record');
+    end
 end
-if(use.kinematicsPC)
-    fprintf(kinematicsPCSocket,'record');
-end
-% fprintf(hyperDeckLeft,'stop\n');
-% fprintf(hyperDeckRight,'stop\n');
 
 % get response to record command (if applicable) and close socket
 % TODO: This will add a small delay, find a workaround
@@ -172,7 +179,6 @@ if(use.hyperDeckRight)
     disp(['RIGHT record: ' strtrim(char(resp))]);
     clear hyperDeckRightSocket;
 end
-
 if(use.kinematicsPC)
     fprintf('KINPC record command sent.\n');
     clear kinematicsPCSocket;
