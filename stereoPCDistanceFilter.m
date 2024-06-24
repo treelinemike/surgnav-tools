@@ -3,7 +3,7 @@ function pc_out = stereoPCDistanceFilter(pc_in,threshold_ratio,varargin)
     % determine whether we should show plots
     show_plots = false;
     if(nargin > 2)
-        show_plots = logical(varargin{1})
+        show_plots = logical(varargin{1});
     end
     if(show_plots)
         figure;
