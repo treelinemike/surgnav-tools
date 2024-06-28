@@ -65,7 +65,8 @@ function pc_out = stereoPCDistanceFilter(pc_in,threshold_ratio,varargin)
     % generate and show final filtered point cloud
     allpts = allpts(savemask,:);
     allcolors = allcolors(savemask,:);
-    pc_out = pointCloud(allpts,"Color",allcolors);
+    allcolors_double = double(allcolors)/255; % this doesn't seem to do much (pc_out.Color still uint8), but pc2surfacemesh won't run without it...
+    pc_out = pointCloud(allpts,"Color",allcolors_double);
     if(show_plots)
         subplot(6,2,[8 10 12]);
         pcax(2) = pcshow(pc_out, 'VerticalAxis', 'z', 'VerticalAxisDir', 'down','BackgroundColor',[1 1 1]);
